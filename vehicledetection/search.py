@@ -1,15 +1,11 @@
-import os.path
-import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2
 import glob
 import time
-from sklearn.svm import LinearSVC
-from sklearn.preprocessing import StandardScaler
 from vehicledetection.sliding_window import slide_window, draw_boxes
-from vehicledetection.features import bin_spatial, color_hist, get_hog_features, extract_features
-from sklearn.model_selection import train_test_split
+from vehicledetection.features import bin_spatial, color_hist, get_hog_features
+from vehicledetection.classifier import Classifier
 
 
 # Define a function to extract features from a single image window
@@ -36,17 +32,17 @@ def single_img_features(img, color_space='RGB', spatial_size=(32, 32),
     else:
         feature_image = np.copy(img)
     # 3) Compute spatial features if flag is set
-    if spatial_feat == True:
+    if spatial_feat:
         spatial_features = bin_spatial(feature_image, size=spatial_size)
         # 4) Append features to list
         img_features.append(spatial_features)
     # 5) Compute histogram features if flag is set
-    if hist_feat == True:
+    if hist_feat:
         hist_features = color_hist(feature_image, nbins=hist_bins)
         # 6) Append features to list
         img_features.append(hist_features)
     # 7) Compute HOG features if flag is set
-    if hog_feat == True:
+    if hog_feat:
         if hog_channel == 'ALL':
             hog_features = []
             for channel in range(feature_image.shape[2]):
@@ -65,7 +61,7 @@ def single_img_features(img, color_space='RGB', spatial_size=(32, 32),
 
 # Define a function you will pass an image
 # and the list of windows to be searched (output of slide_windows())
-def search_windows(img, windows, clf, scaler, color_space='RGB',
+def search_windows(img, windows, classifier, scaler, color_space='RGB',
                    spatial_size=(32, 32), hist_bins=32,
                    hist_range=(0, 256), orient=9,
                    pix_per_cell=8, cell_per_block=2,
@@ -87,7 +83,7 @@ def search_windows(img, windows, clf, scaler, color_space='RGB',
         # 5) Scale extracted features to be fed to classifier
         test_features = scaler.transform(np.array(features).reshape(1, -1))
         # 6) Predict using your classifier
-        prediction = clf.predict(test_features)
+        prediction = classifier.predict(test_features)
         # 7) If positive (prediction == 1) then save the window
         if prediction == 1:
             on_windows.append(window)
@@ -96,111 +92,26 @@ def search_windows(img, windows, clf, scaler, color_space='RGB',
 
 
 if __name__ == "__main__":
+    classifier = Classifier.load()
 
-    # # Read in cars and notcars
-    # images = glob.glob('*.jpeg')
-    # cars = []
-    # notcars = []
-    # for image in images:
-    #     if 'image' in image or 'extra' in image:
-    #         notcars.append(image)
-    #     else:
-    #         cars.append(image)
+    for image_name in glob.glob('../test_images/test*.jpg'):
+        # Check the prediction time for a single sample
+        t = time.time()
+        image = cv2.imread(image_name)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        draw_image = np.copy(image)
 
-    cars_prefix = '../data/vehicles/GTI_Far'
-    notcars_prefix = '../data/non-vehicles/GTI'
-    cars = []
-    notcars = []
+        windows = slide_window(image, x_start_stop=[None, None], y_start_stop=classifier.y_start_stop,
+                               xy_window=(96, 96), xy_overlap=(0.5, 0.5))
 
-    images = glob.glob(os.path.join(notcars_prefix, '*.png'))
-    for image in images:
-        notcars.append(image)
+        hot_windows = search_windows(image, windows, classifier, classifier.scaler, color_space=classifier.color_space,
+                                     spatial_size=classifier.spatial_size, hist_bins=classifier.hist_bins,
+                                     orient=classifier.orient, pix_per_cell=classifier.pix_per_cell,
+                                     cell_per_block=classifier.cell_per_block,
+                                     hog_channel=classifier.hog_channel, spatial_feat=classifier.spatial_feat,
+                                     hist_feat=classifier.hist_feat, hog_feat=classifier.hog_feat)
 
-    images = glob.glob(os.path.join(cars_prefix, '*.png'))
-    for image in images:
-        cars.append(image)
+        window_img = draw_boxes(draw_image, hot_windows, color=(0, 0, 255), thick=6)
 
-
-    # Reduce the sample size because
-    # The quiz evaluator times out after 13s of CPU time
-    sample_size = 500
-    cars = cars[0:sample_size]
-    notcars = notcars[0:sample_size]
-
-    ### TODO: Tweak these parameters and see how the results change.
-    color_space = 'HSV'  # Can be RGB, HSV, LUV, HLS, YUV, YCrCb
-    orient = 12  # HOG orientations
-    pix_per_cell = 16  # HOG pixels per cell
-    cell_per_block = 2  # HOG cells per block
-    hog_channel = "ALL"  # Can be 0, 1, 2, or "ALL"
-    spatial_size = (16, 16)  # Spatial binning dimensions
-    hist_bins = 32  # Number of histogram bins
-    spatial_feat = True  # Spatial features on or off
-    hist_feat = True  # Histogram features on or off
-    hog_feat = True  # HOG features on or off
-    y_start_stop = [400, None]  # Min and max in y to search in slide_window()
-
-    car_features = extract_features(cars, color_space=color_space,
-                                    spatial_size=spatial_size, hist_bins=hist_bins,
-                                    orient=orient, pix_per_cell=pix_per_cell,
-                                    cell_per_block=cell_per_block,
-                                    hog_channel=hog_channel, spatial_feat=spatial_feat,
-                                    hist_feat=hist_feat, hog_feat=hog_feat)
-    notcar_features = extract_features(notcars, color_space=color_space,
-                                       spatial_size=spatial_size, hist_bins=hist_bins,
-                                       orient=orient, pix_per_cell=pix_per_cell,
-                                       cell_per_block=cell_per_block,
-                                       hog_channel=hog_channel, spatial_feat=spatial_feat,
-                                       hist_feat=hist_feat, hog_feat=hog_feat)
-
-    X = np.vstack((car_features, notcar_features)).astype(np.float64)
-    # Fit a per-column scaler
-    X_scaler = StandardScaler().fit(X)
-    # Apply the scaler to X
-    scaled_X = X_scaler.transform(X)
-
-    # Define the labels vector
-    y = np.hstack((np.ones(len(car_features)), np.zeros(len(notcar_features))))
-
-    # Split up data into randomized training and test sets
-    rand_state = np.random.randint(0, 100)
-    X_train, X_test, y_train, y_test = train_test_split(
-        scaled_X, y, test_size=0.2, random_state=rand_state)
-
-    print('Using:', orient, 'orientations', pix_per_cell,
-          'pixels per cell and', cell_per_block, 'cells per block')
-    print('Feature vector length:', len(X_train[0]))
-    # Use a linear SVC
-    svc = LinearSVC()
-    # Check the training time for the SVC
-    t = time.time()
-    svc.fit(X_train, y_train)
-    t2 = time.time()
-    print(round(t2 - t, 2), 'Seconds to train SVC...')
-    # Check the score of the SVC
-    print('Test Accuracy of SVC = ', round(svc.score(X_test, y_test), 4))
-    # Check the prediction time for a single sample
-    t = time.time()
-
-    image = mpimg.imread('../test_images/test1.jpg')
-    draw_image = np.copy(image)
-
-    # Uncomment the following line if you extracted training
-    # data from .png images (scaled 0 to 1 by mpimg) and the
-    # image you are searching is a .jpg (scaled 0 to 255)
-    # image = image.astype(np.float32)/255
-
-    windows = slide_window(image, x_start_stop=[None, None], y_start_stop=y_start_stop,
-                           xy_window=(96, 96), xy_overlap=(0.5, 0.5))
-
-    hot_windows = search_windows(image, windows, svc, X_scaler, color_space=color_space,
-                                 spatial_size=spatial_size, hist_bins=hist_bins,
-                                 orient=orient, pix_per_cell=pix_per_cell,
-                                 cell_per_block=cell_per_block,
-                                 hog_channel=hog_channel, spatial_feat=spatial_feat,
-                                 hist_feat=hist_feat, hog_feat=hog_feat)
-
-    window_img = draw_boxes(draw_image, hot_windows, color=(0, 0, 255), thick=6)
-
-    plt.imshow(window_img)
-    plt.show()
+        plt.imshow(window_img)
+        plt.show()

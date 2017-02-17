@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import glob
 import os.path
+import cv2
 from vehicledetection.sliding_window import slide_window, draw_boxes
 from vehicledetection.features import color_hist, bin_spatial, get_hog_features
 
@@ -9,7 +10,8 @@ from vehicledetection.features import color_hist, bin_spatial, get_hog_features
 def process_sample_images(process):
     images = glob.glob(os.path.join('..', 'test_images', '*'))
     for image_name in images:
-        image = mpimg.imread(image_name)
+        image = cv2.imread(image_name)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         process(image, image_name)
 
 
@@ -22,7 +24,7 @@ def write_result(image, image_name, suffix='', cmap=None):
 
 def sliding_windows():
     image = mpimg.imread('../test_images/test1.jpg')
-    windows = slide_window(image, x_start_stop=[None, None], y_start_stop=[None, None],
+    windows = slide_window(image, x_start_stop=[None, None], y_start_stop=[400, None],
                            xy_window=(128, 128), xy_overlap=(0.5, 0.5))
     window_img = draw_boxes(image, windows, color=(0, 0, 255), thick=6)
     write_result(window_img, 'test1.jpg', suffix='windows')
