@@ -104,7 +104,7 @@ def full_pipeline():
 
 
 if __name__ == "__main__":
-    # sliding_windows()
+    sliding_windows()
     # display_color_hist()
     # display_bin_spatial()
     # process_sample_images(hog)

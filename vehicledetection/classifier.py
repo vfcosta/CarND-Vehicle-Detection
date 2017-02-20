@@ -14,7 +14,7 @@ class Classifier:
     def __init__(self):
         self.svc = None
         self.scaler = None
-        ### TODO: Tweak these parameters and see how the results change.
+        # initialize parameters to use in feature extraction
         self.color_space = 'HSV'  # Can be RGB, HSV, LUV, HLS, YUV, YCrCb
         self.orient = 12  # HOG orientations
         self.pix_per_cell = 16  # HOG pixels per cell
@@ -26,6 +26,7 @@ class Classifier:
         self.hist_feat = True  # Histogram features on or off
         self.hog_feat = True  # HOG features on or off
         self.y_start_stop = [400, None]  # Min and max in y to search in slide_window()
+        self.hist_range = (0, 256)
 
     def train(self):
         images = glob.glob(os.path.join('../data/non-vehicles', '**/*.png'))
@@ -37,7 +38,7 @@ class Classifier:
         car_features = extract_features(cars, color_space=self.color_space,
                                         spatial_size=self.spatial_size, hist_bins=self.hist_bins,
                                         orient=self.orient, pix_per_cell=self.pix_per_cell,
-                                        cell_per_block=self.cell_per_block,
+                                        cell_per_block=self.cell_per_block, hist_range=self.hist_range,
                                         hog_channel=self.hog_channel, spatial_feat=self.spatial_feat,
                                         hist_feat=self.hist_feat, hog_feat=self.hog_feat)
         notcar_features = extract_features(notcars, color_space=self.color_space,

@@ -8,7 +8,7 @@ class Heatmap:
         self.shape = shape  # shape of the images that will be used in heatmap detection
         self.detections = np.zeros(shape[:2])  # array of shape to track detections
         self.threshold = threshold
-        self.decay = 0.1
+        self.decay = 0.5
 
     def add_heat(self, bbox_list):
         """Add a bounding box list to the detection heat map array"""
