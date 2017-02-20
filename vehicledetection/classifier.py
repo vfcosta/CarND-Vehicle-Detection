@@ -5,9 +5,9 @@ import time
 import pickle
 from sklearn.svm import LinearSVC
 from sklearn.preprocessing import StandardScaler
-from vehicledetection.sliding_window import slide_window, draw_boxes
-from vehicledetection.features import bin_spatial, color_hist, get_hog_features, extract_features
+from vehicledetection.features import extract_features
 from sklearn.model_selection import train_test_split
+
 
 class Classifier:
 

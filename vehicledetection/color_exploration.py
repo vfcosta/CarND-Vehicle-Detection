@@ -3,8 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
-def plot3d(pixels, colors_rgb,
-        axis_labels=list("RGB"), axis_limits=[(0, 255), (0, 255), (0, 255)]):
+
+def plot3d(pixels, colors_rgb, axis_labels=list("RGB"), axis_limits=[(0, 255), (0, 255), (0, 255)]):
     """Plot pixels in 3D."""
 
     # Create figure and 3D axes

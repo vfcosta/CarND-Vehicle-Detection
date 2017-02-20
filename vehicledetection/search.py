@@ -1,11 +1,6 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import cv2
-import glob
-import time
-from vehicledetection.sliding_window import slide_window, draw_boxes
 from vehicledetection.features import bin_spatial, color_hist, get_hog_features
-from vehicledetection.classifier import Classifier
 
 
 # Define a function to extract features from a single image window
@@ -89,29 +84,3 @@ def search_windows(img, windows, classifier, scaler, color_space='RGB',
             on_windows.append(window)
     # 8) Return windows for positive detections
     return on_windows
-
-
-if __name__ == "__main__":
-    classifier = Classifier.load()
-
-    for image_name in glob.glob('../test_images/test*.jpg'):
-        # Check the prediction time for a single sample
-        t = time.time()
-        image = cv2.imread(image_name)
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        draw_image = np.copy(image)
-
-        windows = slide_window(image, x_start_stop=[None, None], y_start_stop=classifier.y_start_stop,
-                               xy_window=(96, 96), xy_overlap=(0.5, 0.5))
-
-        hot_windows = search_windows(image, windows, classifier, classifier.scaler, color_space=classifier.color_space,
-                                     spatial_size=classifier.spatial_size, hist_bins=classifier.hist_bins,
-                                     orient=classifier.orient, pix_per_cell=classifier.pix_per_cell,
-                                     cell_per_block=classifier.cell_per_block,
-                                     hog_channel=classifier.hog_channel, spatial_feat=classifier.spatial_feat,
-                                     hist_feat=classifier.hist_feat, hog_feat=classifier.hog_feat)
-
-        window_img = draw_boxes(draw_image, hot_windows, color=(0, 0, 255), thick=6)
-
-        plt.imshow(window_img)
-        plt.show()
