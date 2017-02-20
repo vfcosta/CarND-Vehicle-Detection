@@ -1,8 +1,6 @@
 from moviepy.editor import VideoFileClip
 import os.path
-import numpy as np
-from vehicledetection.pipeline import process_image
-from vehicledetection.draw import draw_boxes
+from vehicledetection.pipeline import generate_result_image
 
 
 base_dir = os.path.dirname(__file__)
@@ -10,9 +8,7 @@ base_dir = os.path.dirname(__file__)
 
 def process_frame(image):
     """Use pipeline to process a single image frame and return an image with lane lines drawn on top"""
-    draw_image = np.copy(image)
-    hot_windows = process_image(image)
-    return draw_boxes(draw_image, hot_windows, color=(0, 0, 255), thick=6)
+    return generate_result_image(image)
 
 
 def process_video(filename):

@@ -7,7 +7,7 @@ import time
 from vehicledetection.sliding_window import slide_window
 from vehicledetection.features import color_hist, bin_spatial, get_hog_features
 from vehicledetection.heatmap import Heatmap
-from vehicledetection.pipeline import process_image
+from vehicledetection.pipeline import process_image, generate_result_image
 from vehicledetection.draw import draw_labeled_bboxes, draw_heatmap_image, draw_boxes
 
 
@@ -95,10 +95,19 @@ def heatmap():
     plt.imshow(cv2.cvtColor(result, cv2.COLOR_BGR2RGB))
     plt.show()
 
+
+def full_pipeline():
+    image = cv2.imread('../test_images/test1.jpg')
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    draw_image = generate_result_image(image)
+    write_result(draw_image, 'test1.jpg', suffix='pipeline')
+
+
 if __name__ == "__main__":
     # sliding_windows()
     # display_color_hist()
     # display_bin_spatial()
     # process_sample_images(hog)
     # search()
-    heatmap()
+    # heatmap()
+    full_pipeline()
