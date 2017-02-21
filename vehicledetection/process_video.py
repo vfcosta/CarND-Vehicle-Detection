@@ -2,7 +2,6 @@ from moviepy.editor import VideoFileClip
 import os.path
 from vehicledetection.pipeline import generate_result_image
 
-
 base_dir = os.path.dirname(__file__)
 
 
@@ -20,5 +19,5 @@ def process_video(filename):
 
 
 if __name__ == '__main__':
-    # process_video('project_video')
-    process_video('test_video')
+    process_video('project_video')
+    # process_video('test_video')

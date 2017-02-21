@@ -97,10 +97,11 @@ def heatmap():
 
 
 def full_pipeline():
-    image = cv2.imread('../test_images/test1.jpg')
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    draw_image = generate_result_image(image)
-    write_result(draw_image, 'test1.jpg', suffix='pipeline')
+    for image_name in glob.glob('../test_images/test*.jpg'):
+        image = cv2.imread(image_name)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        draw_image = generate_result_image(image)
+        write_result(draw_image, image_name, suffix='pipeline')
 
 
 if __name__ == "__main__":

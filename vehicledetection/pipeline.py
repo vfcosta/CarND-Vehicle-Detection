@@ -14,7 +14,7 @@ def generate_result_image(image, display_all_boxes=True, display_heatmap_boxes=T
     global heatmap
     if heatmap == None:
         print("initializing heatmap class")
-        heatmap = Heatmap(image.shape, threshold=2)
+        heatmap = Heatmap(image.shape)
 
     hot_windows = process_image(image)
     heatmap.add_heat(hot_windows)

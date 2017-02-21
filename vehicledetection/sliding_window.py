@@ -33,6 +33,7 @@ def slide_window2(img, x_start_stop=[None, None], y_start_stop=[None, None],
     return window_list
 
 
+
 def slide_window(img, x_start_stop=[None, None], y_start_stop=[None, None],
                  xy_window=(64, 64), xy_overlap=(0.5, 0.5)):
     """Define a function that takes an image, start and stop positions in both x and y,
@@ -49,21 +50,20 @@ def slide_window(img, x_start_stop=[None, None], y_start_stop=[None, None],
     span = (x_start_stop[1] - x_start_stop[0], y_start_stop[1] - y_start_stop[0])
     # Compute the number of pixels per step in x/y
 
-    starty = 0
+    endy = 0
     i = 0
-    while starty < y_start_stop[1]:
+    while endy < y_start_stop[1]:
         i += 1
-        # if i >= 2: break
-        size = int(64 * i/4.0)
+        size = int(xy_window[1] * i * (1 - xy_overlap[1]))
+        # print(size)
         pixels_per_step = (np.array([size, size]) * (1 - np.array(xy_overlap))).astype(int)
         # Compute the number of windows in x/y
         n_windows = (span / pixels_per_step - 1).astype(int)
 
         # Compute y positions
         starty = y_start_stop[0]
-        endy = starty + pixels_per_step[1] + size
-        print(starty, endy)
-        if endy > y_start_stop[1]: break
+        endy = starty + size
+        # print(starty, endy)
 
         # Loop through finding x window positions
         for xs in range(n_windows[0]):

@@ -5,6 +5,7 @@ import time
 import pickle
 from sklearn.svm import LinearSVC
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import confusion_matrix
 from vehicledetection.features import extract_features
 from sklearn.model_selection import train_test_split
 
@@ -14,8 +15,9 @@ class Classifier:
     def __init__(self):
         self.svc = None
         self.scaler = None
+        self.rand_state = np.random.randint(0, 100)
         # initialize parameters to use in feature extraction
-        self.color_space = 'HSV'  # Can be RGB, HSV, LUV, HLS, YUV, YCrCb
+        self.color_space = 'HLS'  # Can be RGB, HSV, LUV, HLS, YUV, YCrCb
         self.orient = 12  # HOG orientations
         self.pix_per_cell = 16  # HOG pixels per cell
         self.cell_per_block = 2  # HOG cells per block
@@ -58,9 +60,8 @@ class Classifier:
         y = np.hstack((np.ones(len(car_features)), np.zeros(len(notcar_features))))
 
         # Split up data into randomized training and test sets
-        rand_state = np.random.randint(0, 100)
         X_train, X_test, y_train, y_test = train_test_split(
-            scaled_X, y, test_size=0.2, random_state=rand_state)
+            scaled_X, y, test_size=0.2, random_state=self.rand_state)
 
         print('Using:', self.orient, 'orientations', self.pix_per_cell,
               'pixels per cell and', self.cell_per_block, 'cells per block')
@@ -76,6 +77,10 @@ class Classifier:
         # Check the score of the SVC
         print('Train Accuracy of SVC = ', round(self.svc.score(X_train, y_train), 4))
         print('Test Accuracy of SVC = ', round(self.svc.score(X_test, y_test), 4))
+        train_cf_matrix = confusion_matrix(y_train, self.svc.predict(X_train))
+        test_cf_matrix = confusion_matrix(y_test, self.svc.predict(X_test))
+        print(train_cf_matrix)
+        print(test_cf_matrix)
 
     def predict(self, features):
         return self.svc.predict(features)
