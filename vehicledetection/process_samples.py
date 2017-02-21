@@ -47,7 +47,7 @@ def bin_spatial(image):
 
 
 def hog(image, image_name, display=False):
-    features = get_hog_features(image[:, :, 0], vis=True, orient=12, pix_per_cell=16, cell_per_block=2)
+    features = get_hog_features(image[:, :, 0], vis=True, orient=12, pix_per_cell=8, cell_per_block=2)
     result = features[1]
     if display:
         plt.imshow(result, cmap='gray')
@@ -108,7 +108,7 @@ if __name__ == "__main__":
     sliding_windows()
     # display_color_hist()
     # display_bin_spatial()
-    # process_sample_images(hog)
+    process_sample_images(hog)
     # search()
     # heatmap()
     full_pipeline()

@@ -33,7 +33,6 @@ def slide_window2(img, x_start_stop=[None, None], y_start_stop=[None, None],
     return window_list
 
 
-
 def slide_window(img, x_start_stop=[None, None], y_start_stop=[None, None],
                  xy_window=(64, 64), xy_overlap=(0.5, 0.5)):
     """Define a function that takes an image, start and stop positions in both x and y,

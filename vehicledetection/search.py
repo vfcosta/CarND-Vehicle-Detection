@@ -3,6 +3,13 @@ import cv2
 from vehicledetection.features import single_img_features
 
 
+def interpolation_method(window):
+    """Return interpolation method for opencv resize based on window size"""
+    if window[1][1] - window[0][1] <= 64 or window[1][0] - window[0][0] <= 64:
+        return cv2.INTER_LINEAR
+    return cv2.INTER_AREA
+
+
 # Define a function you will pass an image
 # and the list of windows to be searched (output of slide_windows())
 def search_windows(img, windows, classifier, scaler, color_space='RGB',
@@ -16,7 +23,8 @@ def search_windows(img, windows, classifier, scaler, color_space='RGB',
     # 2) Iterate over all windows in the list
     for window in windows:
         # 3) Extract the test window from original image
-        test_img = cv2.resize(img[window[0][1]:window[1][1], window[0][0]:window[1][0]], (64, 64))
+        test_img = cv2.resize(img[window[0][1]:window[1][1], window[0][0]:window[1][0]], (64, 64),
+                              interpolation_method(window))
         # 4) Extract features for that window using single_img_features()
         features = single_img_features(test_img, color_space=color_space,
                                        spatial_size=spatial_size, hist_bins=hist_bins,
