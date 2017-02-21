@@ -29,10 +29,10 @@ def draw_labeled_bboxes(img, cars, n_cars):
     return img
 
 
-def draw_heatmap_image(image, heatmap, w=320, h=180, hot_scale=20):
+def draw_heatmap_image(image, heatmap, w=320, h=180, max_value=8):
     """Draw the heatmap on the top right corner of the image."""
     heatmap_resized = cv2.resize(heatmap, (w, h))
-    heatmap_resized = np.clip(heatmap_resized * hot_scale, 0, 255).astype(np.uint8)
+    heatmap_resized = np.clip(heatmap_resized * 255/max_value, 0, 255).astype(np.uint8)
     heatmap_color = cv2.applyColorMap(heatmap_resized, cv2.COLORMAP_HOT)
     heatmap_color = cv2.cvtColor(heatmap_color, cv2.COLOR_BGR2RGB)
     image[0:h, image.shape[1] - w:] = heatmap_color

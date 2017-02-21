@@ -18,14 +18,14 @@ class Heatmap:
         for box in bbox_list:
             # Add += 1 for all pixels inside each bbox assuming each "box" takes the form ((x1, y1), (x2, y2))
             self.detections[box[0][1]:box[1][1], box[0][0]:box[1][0]] += 1
+        self.detections = np.clip(self.detections, 0, 2 * self.threshold)
         # Return updated heatmap detections
         return self.detections
 
     def apply_threshold(self):
         """Zero out pixels below the threshold"""
-        thresholded = self.detections.copy()
-        thresholded[self.detections <= self.threshold] = 0
-        return thresholded
+        self.detections[self.detections <= self.threshold] = 0
+        return self.detections
 
     def detect(self):
         """Apply the threshold and return the cars found in heat map"""
