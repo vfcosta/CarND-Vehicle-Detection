@@ -13,7 +13,7 @@ def draw_boxes(img, bboxes, color=(0, 0, 255), thick=6):
     return imcopy
 
 
-def draw_labeled_bboxes(img, cars, n_cars):
+def draw_labeled_bboxes(img, cars, n_cars, color=(0, 0, 255), thick=6):
     # Iterate through all detected cars
     for car_number in range(1, n_cars + 1):
         # Find pixels with each car_number label value
@@ -24,12 +24,12 @@ def draw_labeled_bboxes(img, cars, n_cars):
         # Define a bounding box based on min/max x and y
         bbox = ((np.min(nonzerox), np.min(nonzeroy)), (np.max(nonzerox), np.max(nonzeroy)))
         # Draw the box on the image
-        cv2.rectangle(img, bbox[0], bbox[1], (0, 0, 255), 6)
+        cv2.rectangle(img, bbox[0], bbox[1], color, thick)
     # Return the image
     return img
 
 
-def draw_heatmap_image(image, heatmap, w=320, h=180, max_value=8):
+def draw_heatmap_image(image, heatmap, w=320, h=180, max_value=12):
     """Draw the heatmap on the top right corner of the image."""
     heatmap_resized = cv2.resize(heatmap, (w, h))
     heatmap_resized = np.clip(heatmap_resized * 255/max_value, 0, 255).astype(np.uint8)

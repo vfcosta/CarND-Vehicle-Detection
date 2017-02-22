@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def slide_window2(img, x_start_stop=[None, None], y_start_stop=[None, None],
+def slide_window(img, x_start_stop=[None, None], y_start_stop=[None, None],
                  xy_window=(64, 64), xy_overlap=(0.5, 0.5)):
     """Define a function that takes an image, start and stop positions in both x and y,
     window size (x and y dimensions), and overlap fraction (for both x and y)
@@ -33,7 +33,7 @@ def slide_window2(img, x_start_stop=[None, None], y_start_stop=[None, None],
     return window_list
 
 
-def slide_window(img, x_start_stop=[None, None], y_start_stop=[None, None],
+def slide_windowaa(img, x_start_stop=[None, None], y_start_stop=[None, None],
                  xy_window=(64, 64), xy_overlap=(0.5, 0.5)):
     """Define a function that takes an image, start and stop positions in both x and y,
     window size (x and y dimensions), and overlap fraction (for both x and y)
@@ -53,12 +53,11 @@ def slide_window(img, x_start_stop=[None, None], y_start_stop=[None, None],
     i = 0
     while endy < y_start_stop[1]:
         i += 1
-        size = int(xy_window[1] * i * (1 - xy_overlap[1]))
-        # print(size)
+        size = max(int(xy_window[1] * i * (1 - xy_overlap[1])), xy_window[1])
         pixels_per_step = (np.array([size, size]) * (1 - np.array(xy_overlap))).astype(int)
         # Compute the number of windows in x/y
         n_windows = (span / pixels_per_step - 1).astype(int)
-
+        # print(size, pixels_per_step)
         # Compute y positions
         starty = y_start_stop[0]
         endy = starty + size
@@ -70,6 +69,7 @@ def slide_window(img, x_start_stop=[None, None], y_start_stop=[None, None],
             startx = xs * pixels_per_step[0] + x_start_stop[0]
             endx = startx + size
             # Append window position to list
-            window_list.append(((startx, starty), (endx, endy)))
+            # print(((startx, starty), (min(endx, x_start_stop[1]), min(endy, y_start_stop[1]))))
+            window_list.append(((startx, starty), (min(endx, x_start_stop[1]), min(endy, y_start_stop[1]))))
     # Return the list of windows
     return window_list

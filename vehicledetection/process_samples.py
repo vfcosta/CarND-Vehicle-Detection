@@ -12,6 +12,7 @@ from vehicledetection.draw import draw_labeled_bboxes, draw_heatmap_image, draw_
 
 
 def process_sample_images(process):
+    print('process images', process.__name__)
     images = glob.glob(os.path.join('..', 'test_images', '*'))
     for image_name in images:
         image = cv2.imread(image_name)
@@ -19,31 +20,46 @@ def process_sample_images(process):
         process(image, image_name)
 
 
-def write_result(image, image_name, suffix='', cmap=None):
+def write_result(image, image_name, suffix='', cmap=None, save_fig=False):
     name, extension = os.path.splitext(os.path.basename(image_name))
     if suffix:
         suffix = '_' + suffix
-    plt.imsave(os.path.join('..', 'output_images', name + suffix + extension), image, cmap=cmap)
+    if save_fig:
+        plt.savefig(os.path.join('..', 'output_images', name + suffix + extension))
+    else:
+        plt.imsave(os.path.join('..', 'output_images', name + suffix + extension), image, cmap=cmap)
 
 
 def sliding_windows():
     image = cv2.imread('../test_images/test1.jpg')
-    windows = slide_window(image, x_start_stop=[None, None], y_start_stop=[400, None],
-                           xy_window=(128, 128), xy_overlap=(0.5, 0.5))
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    windows_settings = [((64, 64), [400, 500]),
+                        ((84, 84), [400, 600]),
+                        ((104, 104), [400, None]),
+                        ((124, 124), [400, None]),
+                        ((144, 144), [400, None])]
+
+    windows = []
+    for xy_window, y_start_stop in windows_settings:
+        windows += slide_window(image, x_start_stop=[None, None], y_start_stop=y_start_stop,
+                           xy_window=xy_window, xy_overlap=(0.5, 0.5))
+    print(len(windows))
     window_img = draw_boxes(image, windows, color=(0, 0, 255), thick=6)
     write_result(window_img, 'test1.jpg', suffix='windows')
 
 
-def color_hist(image):
+def display_color_hist(image, image_name):
     hist = color_hist(image)
+    plt.clf()
     plt.plot(hist)
-    plt.show()
+    write_result(None, image_name, suffix='histogram', save_fig=True)
 
 
-def bin_spatial(image):
+def display_bin_spatial(image, image_name):
     features = bin_spatial(image)
+    plt.clf()
     plt.plot(features)
-    plt.show()
+    write_result(None, image_name, suffix='spatial', save_fig=True)
 
 
 def hog(image, image_name, display=False):
@@ -58,6 +74,7 @@ def hog(image, image_name, display=False):
 
 
 def search():
+    print('search vehicles')
     for image_name in glob.glob('../test_images/test*.jpg'):
         image = cv2.imread(image_name)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -67,36 +84,33 @@ def search():
         hot_windows = process_image(image)
         t2 = time.time()
         print(round(t2 - t, 2), 'Seconds to search for cars...')
-        window_img = draw_boxes(draw_image, hot_windows, color=(0, 0, 255), thick=6)
+        window_img = draw_boxes(draw_image, hot_windows, color=(255, 0, 0), thick=6)
         write_result(window_img, image_name, suffix='search')
 
 
 def heatmap():
+    print('generating samples for heatmap')
     image = cv2.imread('../test_images/test1.jpg')
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     hot_windows = process_image(image)
     heatmap = Heatmap(image.shape, threshold=1)
     heatmap.add_heat(hot_windows)
-    plt.imshow(heatmap.detections, cmap='hot')
-    plt.show()
+    write_result(heatmap.detections, 'test1.jpg', suffix='heatmap_detections', cmap='hot')
 
     cars, n = heatmap.detect()
     print(n, 'cars found')
-    plt.imshow(cars, cmap='gray')
-    plt.show()
+    write_result(cars, 'test1.jpg', suffix='heatmap_thresh', cmap='gray')
 
     # Draw bounding boxes on a copy of the image
     draw_img = draw_labeled_bboxes(np.copy(image), cars, n)
-    # Display the image
-    plt.imshow(cv2.cvtColor(draw_img, cv2.COLOR_BGR2RGB))
-    plt.show()
+    write_result(draw_img, 'test1.jpg', suffix='heatmap_labels')
 
     result = draw_heatmap_image(draw_img, heatmap.detections)
-    plt.imshow(cv2.cvtColor(result, cv2.COLOR_BGR2RGB))
-    plt.show()
+    write_result(result, 'test1.jpg', suffix='result')
 
 
 def full_pipeline():
+    print('generating samples for full pipeline')
     for image_name in glob.glob('../test_images/test*.jpg'):
         image = cv2.imread(image_name)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -105,10 +119,10 @@ def full_pipeline():
 
 
 if __name__ == "__main__":
-    sliding_windows()
-    # display_color_hist()
-    # display_bin_spatial()
-    process_sample_images(hog)
+    # sliding_windows()
+    # process_sample_images(display_color_hist)
+    # process_sample_images(display_bin_spatial)
+    # process_sample_images(hog)
     # search()
-    # heatmap()
-    full_pipeline()
+    heatmap()
+    # full_pipeline()
