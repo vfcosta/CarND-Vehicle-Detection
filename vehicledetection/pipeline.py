@@ -10,7 +10,9 @@ classifier = Classifier.load()
 heatmap = None
 windows = None
 
+
 def generate_result_image(image, display_all_boxes=True, display_heatmap_boxes=True, display_heatmap=True):
+    """Generate an image with bounding boxes representing vehicle detections"""
     global heatmap
     if heatmap is None:
         print("initializing heatmap class")
@@ -34,6 +36,7 @@ def generate_result_image(image, display_all_boxes=True, display_heatmap_boxes=T
 
 
 def slide_windows(image):
+    """Store custom windows for image search using five sizes"""
     global windows
     if windows is not None:
         return windows
@@ -50,8 +53,7 @@ def slide_windows(image):
 
 
 def process_image(image):
-    # windows = slide_window(image, x_start_stop=[None, None], y_start_stop=classifier.y_start_stop,
-    #                        xy_window=(64, 64), xy_overlap=(0.7, 0.7))
+    """Process an input image to return possible windows with detections"""
     windows = slide_windows(image)
     hot_windows = search_windows(image, windows, classifier, classifier.scaler, color_space=classifier.color_space,
                                  spatial_size=classifier.spatial_size, hist_bins=classifier.hist_bins,

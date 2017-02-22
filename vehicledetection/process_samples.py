@@ -56,10 +56,10 @@ def display_color_hist(image, image_name):
 
 
 def display_bin_spatial(image, image_name):
-    features = bin_spatial(image)
-    plt.clf()
-    plt.plot(features)
-    write_result(None, image_name, suffix='spatial', save_fig=True)
+    features = bin_spatial(image, size=(16, 16))
+    spatial_img = np.array(features)
+    spatial_img = np.reshape(spatial_img, (16, 16, 3))
+    write_result(spatial_img, image_name, suffix='spatial')
 
 
 def hog(image, image_name, display=False):
@@ -121,8 +121,8 @@ def full_pipeline():
 if __name__ == "__main__":
     # sliding_windows()
     # process_sample_images(display_color_hist)
-    # process_sample_images(display_bin_spatial)
+    process_sample_images(display_bin_spatial)
     # process_sample_images(hog)
     # search()
-    heatmap()
+    # heatmap()
     # full_pipeline()

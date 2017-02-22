@@ -25,35 +25,64 @@ All source files below have been placed in [`vehicledetection`](vehicledetection
 
 ###Feature Extraction
 
+A module responsible for feature extraction was defined in [`features.py`](vehicledetection/features.py).
+The [`single_img_features`](vehicledetection/features.py#L47) function uses three strategies to extract features from input images.
+This function also convert to a target color space passed as parameter. 
+
 ####1. Histograms of Color
+
+A function [`color_hist`](vehicledetection/features.py#L35) to calculate histograms of color was defined.
+It compute the histogram of the color channels separately and return a concatenated array of features.
+
+Example of histogram applied to an input image:
+
+<img src="test_images/25.png" width="180">
+<img src="output_images/25_histogram.png" width="250">
 
 ####2. Spatial Binning of Color
 
+The function [`bin_spatial`](vehicledetection/features.py#L28) just resize the input image to a fixed size (normally a smaller size) and return a vector of features. 
+
+Example of spatial binning of color:
+
+<img src="test_images/25.png" width="180">
+<img src="output_images/25_spatial.png" width="180">
+
 ####3. Histogram of Oriented Gradients (HOG)
 
-Explain how (and identify where in your code) you extracted HOG features from the training images.
+The function [`get_hog_features`](vehicledetection/features.py#L7) calculates the Histogram of Oriented Gradients (HOG) of an input image.
+It uses the opencv scikit-learn `hog` function to calculate the HOG using a set of input parameters.
+ 
+The parameters used in this project was:
+    ```
+    orient = 12 # HOG  
+    pix_per_cell = 8  # HOG pixels per cell
+    cell_per_block = 2  # HOG cells per block
+    hog_channel = "ALL"  # All channels from an image with HLS color space
+    ```
 
-The code for this step is contained in the first code cell of the IPython notebook (or in lines # through # of the file called `some_file.py`).  
+See above a visualization of HOG applied to an image:
+
+<img src="test_images/25.png" width="180">
+<img src="output_images/25_hog.png" width="180">
+
+###SVM Classifier
+Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
+
+I trained a linear SVM using...
+
 
 I started by reading in all the `vehicle` and `non-vehicle` images.  Here is an example of one of each of the `vehicle` and `non-vehicle` classes:
-
-![alt text][image1]
 
 I then explored different color spaces and different `skimage.hog()` parameters (`orientations`, `pixels_per_cell`, and `cells_per_block`).  I grabbed random images from each of the two classes and displayed them to get a feel for what the `skimage.hog()` output looks like.
 
 Here is an example using the `YCrCb` color space and HOG parameters of `orientations=8`, `pixels_per_cell=(8, 8)` and `cells_per_block=(2, 2)`:
 
 
-![alt text][image2]
-
 ####2. Explain how you settled on your final choice of HOG parameters.
 
 I tried various combinations of parameters and...
 
-###SVM Classifier
-Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).
-
-I trained a linear SVM using...
 
 ###Sliding Window Search
 
