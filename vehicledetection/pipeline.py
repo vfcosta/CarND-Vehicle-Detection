@@ -41,14 +41,14 @@ def slide_windows(image):
     if windows is not None:
         return windows
     windows = []
-    windows_settings = [((64, 64), [400, 500]),
-                        ((84, 84), [400, 600]),
-                        ((104, 104), [400, None]),
-                        ((124, 124), [400, None]),
-                        ((144, 144), [400, None])]
-    for xy_window, y_start_stop in windows_settings:
+    windows_settings = [((64, 64), [400, 500], (0.5, 0.5)),
+                        ((84, 84), [400, 600], (0.5, 0.5)),
+                        ((104, 104), [400, None], (0.5, 0.5)),
+                        ((124, 124), [400, None], (0.5, 0.5)),
+                        ((144, 144), [400, None], (0.5, 0.5))]
+    for xy_window, y_start_stop, xy_overlap in windows_settings:
         windows += slide_window(image, x_start_stop=[None, None], y_start_stop=y_start_stop,
-                           xy_window=xy_window, xy_overlap=(0.5, 0.5))
+                           xy_window=xy_window, xy_overlap=xy_overlap)
     return windows
 
 

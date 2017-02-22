@@ -4,7 +4,7 @@ import numpy as np
 
 class Heatmap:
 
-    def __init__(self, shape, threshold=4):
+    def __init__(self, shape, threshold=3):
         self.shape = shape  # shape of the images that will be used in heatmap detection
         self.detections = np.zeros(shape[:2])  # array of shape to track detections
         self.threshold = threshold
