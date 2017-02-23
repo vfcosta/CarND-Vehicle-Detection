@@ -11,7 +11,7 @@ heatmap = None
 windows = None
 
 
-def generate_result_image(image, display_all_boxes=True, display_heatmap_boxes=True, display_heatmap=True):
+def generate_result_image(image, display_all_boxes=False, display_heatmap_boxes=True, display_heatmap=False):
     """Generate an image with bounding boxes representing vehicle detections"""
     global heatmap
     if heatmap is None:
@@ -41,7 +41,7 @@ def slide_windows(image):
     if windows is not None:
         return windows
     windows = []
-    windows_settings = [((64, 64), [400, 500], (0.5, 0.5)),
+    windows_settings = [((64, 64), [400, 500], (0.6, 0.6)),
                         ((84, 84), [400, 600], (0.5, 0.5)),
                         ((104, 104), [400, None], (0.5, 0.5)),
                         ((124, 124), [400, None], (0.5, 0.5)),
