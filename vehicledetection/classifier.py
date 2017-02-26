@@ -3,11 +3,13 @@ import numpy as np
 import glob
 import time
 import pickle
+import matplotlib.pyplot as plt
 from sklearn.svm import LinearSVC
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import confusion_matrix
 from vehicledetection.features import extract_features
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
 
 
 class Classifier:
@@ -78,9 +80,11 @@ class Classifier:
         print('Train Accuracy of SVC = ', round(self.svc.score(X_train, y_train), 4))
         print('Test Accuracy of SVC = ', round(self.svc.score(X_test, y_test), 4))
         train_cf_matrix = confusion_matrix(y_train, self.svc.predict(X_train))
-        test_cf_matrix = confusion_matrix(y_test, self.svc.predict(X_test))
+        y_pred = self.svc.predict(X_test)
+        test_cf_matrix = confusion_matrix(y_test, y_pred)
         print(train_cf_matrix)
         print(test_cf_matrix)
+        print(classification_report(y_test, y_pred))
 
     def predict(self, features):
         return self.svc.predict(features)
@@ -88,6 +92,11 @@ class Classifier:
     def save(self, filename='classifier.p'):
         """Save parameters from Classifier class in file"""
         pickle.dump(vars(self), open(filename, "wb"))
+
+    def save_confusion_matrix(self, cm):
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]  # normalize confusion matrix
+        plt.matshow(cm, cmap='gray')
+        plt.show()
 
     @staticmethod
     def load(filename='classifier.p'):
