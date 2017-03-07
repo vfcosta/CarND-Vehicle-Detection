@@ -21,7 +21,7 @@ class Classifier:
         # initialize parameters to use in feature extraction
         self.color_space = 'HLS'  # Can be RGB, HSV, LUV, HLS, YUV, YCrCb
         self.orient = 12  # HOG orientations
-        self.pix_per_cell = 8  # HOG pixels per cell
+        self.pix_per_cell = 16  # HOG pixels per cell
         self.cell_per_block = 2  # HOG cells per block
         self.hog_channel = "ALL"  # Can be 0, 1, 2, or "ALL"
         self.spatial_size = (16, 16)  # Spatial binning dimensions
