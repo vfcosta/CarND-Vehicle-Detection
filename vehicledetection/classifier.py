@@ -19,7 +19,7 @@ class Classifier:
         self.scaler = None
         self.rand_state = np.random.randint(0, 100)
         # initialize parameters to use in feature extraction
-        self.color_space = 'HLS'  # Can be RGB, HSV, LUV, HLS, YUV, YCrCb
+        self.color_space = 'YUV'  # Can be RGB, HSV, LUV, HLS, YUV, YCrCb
         self.orient = 12  # HOG orientations
         self.pix_per_cell = 16  # HOG pixels per cell
         self.cell_per_block = 2  # HOG cells per block
